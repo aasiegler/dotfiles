@@ -84,6 +84,7 @@
 
 (global-set-key "\C-x\C-c" 'paranoid-exit-from-emacs)
 
+(global-set-key '[f11] 'w32-fullscreen)
 
 
 ;;;------------------------------------------------------
