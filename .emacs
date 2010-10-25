@@ -99,7 +99,8 @@
 						   "site-lisp/slime"
 						   "site-lisp/slime/contrib"
 						   "site-lisp/tnt-2.6"
-						   "site-lisp/w3m"))
+						   "site-lisp/w3m"
+						   "site-lisp/darkroom"))
 						load-path))
 (add-to-list 'load-path "/usr/share/emacs/site-lisp/w3m")
 (if mswindows-p
@@ -119,6 +120,7 @@
 (require 'slime)
 (require 'slime-autoloads)
 (require 'tnt)
+(require 'w32-fullscreen)
 (require 'w3m-load)
 
 (autoload 'csharp-mode "csharp-mode.el" "Major mode for editing C# code." t)
