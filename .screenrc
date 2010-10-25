@@ -1,0 +1,13 @@
+hardstatus alwayslastline
+hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{=kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B}%Y-%m-%d %{W}%c %{g}]'
+vbell off
+startup_message off
+defutf8 on
+escape ^}]
+termcapinfo xterm|xterms|xs|rxvt ti@:te@
+shell zsh
+defscrollback 5000
+
+# default screens
+#screen -t emacs			1		emacs -nw
+#screen -t bash1			0		bash
