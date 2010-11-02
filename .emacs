@@ -47,6 +47,8 @@
 (when mswindows-p
   (setq python-python-command "C:/Python/Python27/python.exe"))
 
+(setq ipython-command "/usr/bin/ipython")
+
 ;; I'd rather use zsh with both but it works poorly
 ;; in my setup
 (if mswindows-p
@@ -111,11 +113,13 @@
 (load-library "misc")
 (load-library "font-select")
 
+
 (require 'cl)
 (require 'color-theme)
 (require 'cltl2)
-(require 'g-utils)
 (require 'fic-mode)
+(require 'g-utils)
+(require 'ipython)
 (require 'rainbow-parens)
 (require 'scratch)
 (require 'slime)
@@ -172,6 +176,11 @@
 	(cygwin-mount-activate)))
 
 (setq org-agenda-files (list "~/org" "~/My Dropbox/org"))
+
+;; remove system32 from exec path because fuck C:/Windows/system32/find.exe
+(setf exec-path (remove-if (lambda (x) (stringi= "c:/windows/system32" x))
+						   exec-path))
+
 
 
 ;;;------------------------------------------------------
