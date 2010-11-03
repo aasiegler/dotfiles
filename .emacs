@@ -14,7 +14,7 @@
 (defvar mswindows-p 
   (not (null (string-match "windows" (symbol-name system-type)))))
 (defvar cygwin-p
-  (not (null (string-match "cygwin" (system-type system-type)))))
+  (not (null (string-match "cygwin" (symbol-name system-type)))))
 (defvar home (concat (expand-file-name "~") "/"))
 (defvar emacs-home (concat home ".emacs.d/"))
 
