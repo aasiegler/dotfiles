@@ -121,6 +121,7 @@
 (require 'cltl2)
 (require 'fic-mode)
 (require 'g-utils)
+(require 'python-mode)
 (require 'ipython)
 (require 'rainbow-parens)
 (require 'scratch)
