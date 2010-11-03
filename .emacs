@@ -13,6 +13,8 @@
 ;;;------------------------------------------------------
 (defvar mswindows-p 
   (not (null (string-match "windows" (symbol-name system-type)))))
+(defvar cygwin-p
+  (not (null (string-match "cygwin" (system-type system-type)))))
 (defvar home (concat (expand-file-name "~") "/"))
 (defvar emacs-home (concat home ".emacs.d/"))
 
@@ -51,7 +53,7 @@
 
 ;; I'd rather use zsh with both but it works poorly
 ;; in my setup
-(if mswindows-p
+(if (or mswindows-p cygwin-p)
 	(unless (get-buffer "*eshell*")
 	  (eshell))
   (unless (get-buffer "*ansi-term*")
