@@ -15,6 +15,9 @@
   (not (null (string-match "windows" (symbol-name system-type)))))
 (defvar cygwin-p
   (not (null (string-match "cygwin" (symbol-name system-type)))))
+(defvar running-in-terminal-p
+  (null window-system))
+
 (defvar home (concat (expand-file-name "~") "/"))
 (defvar emacs-home (concat home ".emacs.d/"))
 
@@ -49,7 +52,8 @@
 (when mswindows-p
   (setq python-python-command "C:/Python/Python27/python.exe"))
 
-(setq ipython-command "/usr/bin/ipython")
+;; don't have to set as long as it's in $PATH
+;;(setq ipython-command "/usr/bin/ipython")
 
 ;; I'd rather use zsh with both but it works poorly
 ;; in my setup
@@ -161,7 +165,9 @@
 		  "inconsolata 11"
 		  "Mono 10")
 (color-theme-initialize)
-(color-theme-tangotango)
+(if running-in-terminal-p
+	(color-theme-arjen)
+  (color-theme-tangotango))
 ;; arjen clarity sitaramv-solaris tangotango
 
 (if mswindows-p
