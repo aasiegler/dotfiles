@@ -151,3 +151,24 @@ the character typed."
 							 (if (boundp 'old-fullscreen) old-fullscreen nil)
 						   (progn (setq old-fullscreen current-value)
 								  'fullboth)))))
+
+
+(defun prev-window (count)
+  (interactive "p")
+  (other-window (- count)))
+
+;; FIXME if buffer has no file it'll assign it "" which may
+;; match some patters - this is a bug
+(defun kill-all-buffers (&optional bname pattern)
+  "Kills all buffers matching pattern - all if not supplied. 
+Applies pattern to file name, or buffer name if prefix arg
+Ignores buffers that like *this*"
+  (interactive "P\nsKill Pattern: ")
+  (let ((killp (if (or (null pattern) (string= "" pattern))
+				   ".*"
+				 pattern)))
+	(loop for b in (buffer-list)
+		  when (let ((name (if bname (buffer-name b) (or (buffer-file-name b) ""))))
+				 (and (string-match killp name)
+					  (not (string-match "\\*.*\\*" name))))
+		  do (kill-buffer b))))
