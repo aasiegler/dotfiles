@@ -14,5 +14,5 @@
   "Sets the first font in the parameter list that exists"
   `(or
 	,@(loop for f in font
-			collecting `(return-if-errors (set-default-font ,f) ,f))))
+			collecting `(return-if-errors (set-frame-font ,f) ,f))))
 
