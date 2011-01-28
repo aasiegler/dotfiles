@@ -1,3 +1,12 @@
+;; You can use Firefox rather than Xulrunner to launch Conkeror by
+;; doing bin/firefox -app ~/src/conkeror/application.ini.
+
+;; TODO byte compile site-lisp directory
+
+(load-file "~/.gnus")
+
+(require 'cl)
+
 ;;; This was installed by package-install.el.
 ;;; This provides support for the package system and
 ;;; interfacing with ELPA, the package archive.
@@ -8,6 +17,7 @@
      (expand-file-name "~/.emacs.d/elpa/package.el"))
   (package-initialize))
 
+
 ;;;------------------------------------------------------
 ;;; basic options
 ;;;------------------------------------------------------
@@ -46,6 +56,8 @@
 
 (fset 'yes-or-no-p 'y-or-n-p)
 (iswitchb-mode 1)
+(setq confirm-nonexistent-file-or-buffer nil)
+(setq iswitchb-prompt-newbuffer nil)
 
 (setq frame-title-format (concat  "%b - emacs@" system-name))
 
@@ -53,7 +65,8 @@
   (setq python-python-command "C:/Python/Python27/python.exe"))
 
 ;; don't have to set as long as it's in $PATH
-;;(setq ipython-command "/usr/bin/ipython")
+;; (setq ipython-command "/usr/bin/ipython")
+;; note: start with C-c !
 
 ;; I'd rather use zsh with both but it works poorly
 ;; in my setup
@@ -63,9 +76,40 @@
   (unless (get-buffer "*ansi-term*")
 	(ansi-term "zsh")))
 
+;; I want to do something so this works
+;; probably like after-eval 
+;; I do something similar later but it doesn't work
+;; (setf eshell-path-env (concat eshell-path-env
+;; 							  ";"
+;; 							  "C:/Cygwin/bin"))
+;; (setf eshell-path-env (concat eshell-path-env ";" "C:/Program Files (x86)/Mozilla Firefox 4.0 Beta 8/"))
+;; (labels ((add-path (p)
+;; 				   (setenv "PATH" (concat p ";" (getenv "PATH")))))
+;;   (add-path "C:/Cygwin/bin")
+;;   (add-path "C:/Util/gnutls-2.10.1/bin"))
+;; (add-path "C:/Program\\ Files\\ (x86)/Mozilla\\ Firefox\\ 4.0\\ Beta\\ 8/"))
+
+(setf browse-url-firefox-program "C:/Program Files (x86)/Mozilla Firefox 4.0 Beta 9/firefox.exe")
+
+
+										; setting the PC keyboard's various keys to Super or Hyper
+(setq w32-pass-lwindow-to-system nil
+      w32-pass-rwindow-to-system nil
+      w32-pass-apps-to-system nil
+      w32-lwindow-modifier 'super ;; Left Windows key
+      w32-rwindow-modifier 'super ;; Right Windows key
+      w32-apps-modifier 'hyper) ;; Menu key
+
+
 ;;;------------------------------------------------------
 ;;; set-keys
 ;;;------------------------------------------------------
+
+;; keybindings for anything 
+;; (global-set-key [(super a)] 'anything)
+(global-set-key (kbd "s-a") 'anything)
+(global-set-key (kbd "s-x") 'anything-M-x)
+
 
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
@@ -79,38 +123,56 @@
 ;; (global-set-key "%" 'goto-match-paren)
 
 (global-set-key '[f4] 'speedbar-get-focus)
-(global-set-key (kbd "C-c C-t") 'toggle-transparency)
 
 (global-set-key "\C-c\C-h" 'ff-find-other-file)
 
 (global-set-key (kbd "C-x W") 'fix-horizontal-size)
+
+(global-set-key "\M-n" 'other-window)
+(global-set-key "\M-p" 'prev-window)
+
+(global-set-key "\C-x\M-k" 'kill-all-buffers)
 
 (global-unset-key (kbd "<left>"))
 (global-unset-key (kbd "<right>"))
 (global-unset-key (kbd "<up>"))
 (global-unset-key (kbd "<down>"))
 
+(global-set-key "\C-c\C-t" 'insert-literal-tab)
+
 (global-set-key "\C-x\C-c" 'paranoid-exit-from-emacs)
 
 (global-set-key '[f11] 'w32-fullscreen)
 
-
+
 ;;;------------------------------------------------------
 ;;; load/autoloading .el files
 ;;;------------------------------------------------------
-(setq load-path (append (mapcar
-						 (lambda (p) (concat emacs-home p))
-						 '("lisp/"
-						   "site-lisp"
-						   "site-lisp/color-theme-6.6.0"
-						   "site-lisp/elib-1.0"
-						   "site-lisp/jdee-2.4.0.1/lisp"
-						   "site-lisp/slime"
-						   "site-lisp/slime/contrib"
-						   "site-lisp/tnt-2.6"
-						   "site-lisp/w3m"
-						   "site-lisp/darkroom"))
-						load-path))
+;; (setq load-path (append (mapcar
+;; 						 (lambda (p) (concat emacs-home p))
+;; 						 '("lisp/"
+;; 						   "site-lisp"
+;; 						   "site-lisp/color-theme-6.6.0"
+;; 						   "site-lisp/elib-1.0"
+;; 						   "site-lisp/jdee-2.4.0.1/lisp"
+;; 						   "site-lisp/slime"
+;; 						   "site-lisp/slime/contrib"
+;; 						   "site-lisp/tnt-2.6"
+;; 						   "site-lisp/w3m"
+;; 						   "site-lisp/darkroom"))
+;; 						load-path))
+(mapcar (lambda (p) (add-to-list 'load-path (concat emacs-home p)))
+		'("lisp/"
+		  "site-lisp"
+		  "site-lisp/color-theme-6.6.0"
+		  "site-lisp/elib-1.0"
+		  "site-lisp/jdee-2.4.0.1/lisp"
+		  "site-lisp/slime"
+		  "site-lisp/slime/contrib"
+		  "site-lisp/tnt-2.6"
+		  "site-lisp/w3m"
+		  "site-lisp/darkroom"))
+
 (add-to-list 'load-path "/usr/share/emacs/site-lisp/w3m")
 (if mswindows-p
 	(add-to-list 'load-path "c:/Util/IdeBridge/lisp"))
@@ -119,19 +181,23 @@
 (load-library "misc")
 (load-library "font-select")
 
-
-(require 'cl)
+(require 'ansi)
+(require 'anything)
+(require 'anything-config)
+(require 'anything-match-plugin)
 (require 'color-theme)
 (require 'cltl2)
 (require 'fic-mode)
 (require 'g-utils)
 (require 'python-mode)
-(require 'ipython)
+;; FIXME can't get this to work on windows
+;;(require 'ipython)
 (require 'rainbow-parens)
 (require 'scratch)
 (require 'slime)
 (require 'slime-autoloads)
 (require 'tnt)
+(require 'uniquify)
 (require 'w32-fullscreen)
 (require 'w3m-load)
 
@@ -156,7 +222,7 @@
 				("\\.php$" . php-mode)
 				("\\.i$" . intercal-mode)
 				("\\.nsi$" . nsi-mode)
-				("\\.java$" . jde-mode))
+				("\\.java$" . java-mode)) ;; jde-mode but that don't work right now
 			  auto-mode-alist))
 ;; ("\\.py$" . python-mode)
 
@@ -166,7 +232,9 @@
 		  "Mono 10")
 (color-theme-initialize)
 (if running-in-terminal-p
-	(color-theme-arjen)
+	(progn
+	  (color-theme-arjen)
+	  (color-theme-arjen))
   (color-theme-tangotango))
 ;; arjen clarity sitaramv-solaris tangotango
 
@@ -190,8 +258,37 @@
 (setf exec-path (remove-if (lambda (x) (stringi= "c:/windows/system32" x))
 						   exec-path))
 
+;; erc stuff 
+;; TODO put this in another file (.emacs.d/lisp/erc-setup.el)
+(erc-track-mode t)
+(setf erc-track-exclude-types '("JOIN" "NICK" "PART" "QUIT" "MODE"
+								"324" "329" "332" "333" "353" "477"))
+(setf erc-hide-list '("JOIN" "PART" "QUIT" "NICK"))
+(setf erc-log-channels-directory "~/.erc/logs/")
+(setf erc-save-buffer-on-part t)
+
+(require 'erc-join)
+(erc-autojoin-mode 1)
+(setq erc-autojoin-channels-alist
+	  '(("freenode.net" "#emacs" "#python" "#lisp" "#scheme" "#clojure")))
+
+(load-library "erc-setup")
+;; Truncate buffers so they don't hog core.
+
+;; TODO figure out how to make this work. truncates to 0 lines which
+;; is not at all what I want. it does save on truncation which is nice
+;; er... this should truncate to 20k lines though
+
+;; (setq erc-max-buffer-size 20000)
+;; (defvar erc-insert-post-hook)
+;; (add-hook 'erc-insert-post-hook 'erc-truncate-buffer)
+;; (setq erc-truncate-buffer-on-save t)
+
+;; erc-truncate-buffer-to-size
 
 
+
+
 ;;;------------------------------------------------------
 ;;; shell (for jde)
 ;;;------------------------------------------------------
@@ -203,83 +300,86 @@
 ;; (if (boundp 'w32-quote-process-args)
 ;;   (setq w32-quote-process-args ?\")) ;; Include only for MS Windows.
 
-
+
 ;;;------------------------------------------------------
 ;;; offsets and stuff
 ;;;------------------------------------------------------
 ;; yo so to find what part you are in it's c-set-offset (C-c C-o)
 
+;; elisp
+(add-hook 'emacs-lisp-mode-hook 'turn-on-fic-mode)
 
 ;; c-mode stuff
 (add-hook 'c-mode-common-hook 
-          (lambda ()
-            (setq tab-width 4)
-            (setq c-basic-offset 4)
-            (c-set-offset 'substatement-open 0)
-            (c-toggle-hungry-state t)))
+		  (lambda ()
+			(setq tab-width 4)
+			(setq c-basic-offset 4)
+			(c-set-offset 'substatement-open 0)
+			(c-toggle-hungry-state t)))
 
 (add-hook 'c-mode-common-hook 'turn-on-fic-mode)
 
 ;; c++-mode stuff
 (add-hook 'c++-mode-hook
-          (lambda ()
-            (setq tab-width 4)
-            (setq c-basic-offset 4)))
+		  (lambda ()
+			(setq tab-width 4)
+			(setq c-basic-offset 4)))
 
 (add-hook 'python-mode-hook
-          (lambda ()
-            (setq tab-width 4)))
+		  (lambda ()
+			(setq indent-tabs-mode nil)
+			(setq tab-width 4)))
 
 ;; php-mode stuff
 ;; making indents and tabs the same as everyone else
 (add-hook 'php-mode-hook
-          (lambda ()
-            (setq tab-width 4)
-            (setq c-basic-offset 4)
-            (c-set-offset 'topmost-intro-cont 4)
-            (c-set-offset 'class-open 0)
-            (c-set-offset 'inline-open 0)
-            (c-set-offset 'substatement-open 0)
-            (c-set-offset 'arglist-intro '+)))
+		  (lambda ()
+			(setq tab-width 4)
+			(setq c-basic-offset 4)
+			(c-set-offset 'topmost-intro-cont 4)
+			(c-set-offset 'class-open 0)
+			(c-set-offset 'inline-open 0)
+			(c-set-offset 'substatement-open 0)
+			(c-set-offset 'arglist-intro '+)))
 
 ;; sql-mode
 (add-hook 'sql-mode-hook
-          (lambda ()
-            ;; tabs are spaces
-            (setq indent-tabs-mode nil)))
+		  (lambda ()
+			;; tabs are spaces
+			(setq indent-tabs-mode nil)))
 
 ;; java-mode
 (add-hook 'java-mode-hook
-          (lambda ()
-            ;; basically for switch statement
-            (c-set-offset 'substatement-open 0)
-            (c-toggle-hungry-state t)))
+		  (lambda ()
+			;; basically for switch statement
+			(c-set-offset 'substatement-open 0)
+			(c-toggle-hungry-state t)))
 
 (add-hook 'csharp-mode-hook
-          (lambda ()
-            (c-set-offset 'statement-block-intro 4)))
+		  (lambda ()
+			(c-set-offset 'statement-block-intro 4)))
 
 ;; this is all kind of shitty
 (add-hook 'jde-mode-hook
-          (lambda ()
-            (defun jde-debug-or-cont ()
-              "Double duty to either start or continue debugging"
-              (interactive)
-              (if (jde-debugger-running-p)
-                  (jde-debug-cont)
-                (jde-debug)))
-            (define-key jde-mode-map '[f11] 'jde-debug-step-into)
-            (define-key jde-mode-map '[f10] 'jde-debug-step-over)
-            (define-key jde-mode-map '[S-f11] 'jde-debug-step-out)
-            (define-key jde-mode-map '[f9] 'jde-debug-toggle-breakpoint)
-            (define-key jde-mode-map '[f5] 'jde-debug-or-cont)
-            (define-key jde-mode-map '[S-f5] 'jde-debug-quit)
-            (setq iswitchb-buffer-ignore 
-                  '("^ " 
-                    "^\\*[^.]*\\.[^.]*\\..*"
-                    "\\*JDE"
-                    "\\*jde"
-                    ))))
+		  (lambda ()
+			(defun jde-debug-or-cont ()
+			  "Double duty to either start or continue debugging"
+			  (interactive)
+			  (if (jde-debugger-running-p)
+				  (jde-debug-cont)
+				(jde-debug)))
+			(define-key jde-mode-map '[f11] 'jde-debug-step-into)
+			(define-key jde-mode-map '[f10] 'jde-debug-step-over)
+			(define-key jde-mode-map '[S-f11] 'jde-debug-step-out)
+			(define-key jde-mode-map '[f9] 'jde-debug-toggle-breakpoint)
+			(define-key jde-mode-map '[f5] 'jde-debug-or-cont)
+			(define-key jde-mode-map '[S-f5] 'jde-debug-quit)
+			(setq iswitchb-buffer-ignore 
+				  '("^ " 
+					"^\\*[^.]*\\.[^.]*\\..*"
+					"\\*JDE"
+					"\\*jde"
+					))))
 
 ;; so VS uses
 ;; F5        start debugging (also continue?)
@@ -293,25 +393,36 @@
 ;; xml-mode (there is a sub-mode of this for xml but who knows how
 ;; to use it)
 (add-hook 'sgml-mode-hook
-          (lambda ()
-            (define-key sgml-mode-map "\C-c\C-c" 'comment-region)))
+		  (lambda ()
+			(define-key sgml-mode-map "\C-c\C-c" 'comment-region)))
 
 
 ;; cs-mode
 ;; let's try to match what VS does so we can play nice
 (add-hook 'csharp-mode-hook
-          (lambda ()
-            (c-set-offset 'statement-cont 4)
-            (c-set-offset 'arglist-cont-nonempty 4)))
+		  (lambda ()
+			(c-set-offset 'statement-cont 4)
+			(c-set-offset 'arglist-cont-nonempty 4)))
 
 (add-hook 'lisp-mode-hook
 		  (lambda ()
 			(define-key lisp-mode-map "\C-c\C-v" 'cltl2-lookup)))
 
+(add-hook 'lisp-interaction-mode-hook
+		  (lambda () 
+			(eldoc-mode)))
+
+(add-hook 'emacs-lisp-mode-hook
+		  (lambda ()
+			(eldoc-mode)))
+
 (add-hook 'find-file-hook 'bh-choose-header-mode)
 
-
-
+(add-hook 'after-save-hook
+		  'executable-make-buffer-file-executable-if-script-p)
+(add-hook 'after-save-hook
+		  'switch-mode-if-shebang)
+
 ;;;------------------------------------------------------
 ;;; variables!
 ;;;------------------------------------------------------
@@ -324,30 +435,66 @@
 			 ("gcj" . "/usr/lib/jvm/java-gcj")))))
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- ;;'(jde-ant-read-buildfile t)
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(browse-url-browser-function (function browse-url-firefox))
+ '(erc-modules (quote (autojoin button completion fill irccontrols list log match menu move-to-prompt netsplit networks noncommands readonly ring stamp track)))
+ '(fic-background-color "Black")
+ '(fic-foreground-color "Red")
+ '(fic-highlighted-words (quote ("FIXME" "TODO" "BUG" "KLUDGE" "HACK")))
  '(jde-compile-option-command-line-args (quote ("-Xlint")))
  '(jde-jdk (quote ("1.6.0")))
- ; '(jde-jdk-doc-url "http://java.sun.com/j2se/1.5.0/docs/api/")
  '(jde-jdk-doc-url "http://download-llnw.oracle.com/javase/6/docs/api")
  '(jde-jdk-registry jdk-locations)
- ;; '(jde-jdk-registry (quote 
- ;; 					 (("1.5.0" . "/usr/lib/jvm/java-1.5.0-sun") 
- ;; 					  ("1.6.0" . "/usr/lib/jvm/java-6-sun") 
- ;; 					  ("gcj" . "/usr/lib/jvm/java-gcj"))))
- '(browse-url-browser-function #'w3m-goto-url)
- ;; '(tnt-username-alist (("aaronsiegler") ("heyitsjesusc")))
- '(tnt-auto-reconnect nil))
+ '(tnt-auto-reconnect nil)
+ '(uniquify-buffer-name-style (quote post-forward) nil (uniquify)))
+
+;; FIXME make fic-mode work so I don't have to do this
+;; FIXME eval-on-load ?
+(modify-face 'font-lock-fic-face fic-foreground-color
+			 fic-background-color nil t nil t nil nil)
+(setf fic-search-list-re (regexp-opt fic-highlighted-words nil))
+
+
 (custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
  '(twit-title-face ((t (:background "black" :underline "DeepSkyBlue"))))
  '(twit-zebra-1-face ((t (:background "gray30"))))
  '(twit-zebra-2-face ((t (:background "black")))))
 
+
+
+;; (defvar imap-ssl-program '("openssl s_client -quiet -ssl3 -crlf -connect %s:%p"
+;; 						   "openssl s_client -quiet -ssl2 -crlf -connect %s:%p"
+;; 						   "s_client -quiet -ssl3 -crlf -connect %s:%p"
+;; 						   "s_client -quiet -ssl2 -crlf -connect %s:%p")
+;;   "A string, or list of strings, containing commands for SSL connections.
+;; Within a string, %s is replaced with the server address and %p with
+;; port number on server.  The program should accept IMAP commands on
+;; stdin and return responses to stdout.  Each entry in the list is tried
+;; until a successful connection is made.")
+(defvar imap-log t)
+(defvar imap-debug t)
+
+(put 'narrow-to-region 'disabled nil)
+
+;; I think something earlier on is clobbering this
+;; even here it doesn't work
+;; if I execute it in the scratch buffer it will though
+(labels ((add-path (p)
+				   (setenv "PATH" (concat p ";" (getenv "PATH")))))
+  ;; (add-path "C:/Cygwin/bin")
+  (add-path "C:/Util/gnutls-2.10.1/bin"))
+
+
+;;; misc crap - move me
+(add-hook 'isearch-mode-end-hook 'my-goto-match-beginning)
+;; holy crap this is good
+(defun my-goto-match-beginning ()
+  (when isearch-forward (goto-char isearch-other-end)))
 
