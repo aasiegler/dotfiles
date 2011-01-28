@@ -172,3 +172,72 @@ Ignores buffers that like *this*"
 				 (and (string-match killp name)
 					  (not (string-match "\\*.*\\*" name))))
 		  do (kill-buffer b))))
+
+(defun insert-literal-tab ()
+  "Inserts a tab"
+  (interactive)
+  (insert ?\t))
+
+;; TODO add mode map (bash dash etc go to sh-mode)
+;; TODO docstring
+;; (defun switch-mode-if-shebang ()
+;;   (when (eq major-mode 'fundamental-mode)
+;; 	(save-excursion
+;; 	  (goto-char (point-min))
+;; 	  (when (search-forward-regexp "^#!.*?\\([^ /]+\\)$" (point-at-eol) t)
+;; 		(let ((mode (match-string-no-properties 1)))
+;; 		  (eval (read (concat "(" mode "-mode)"))))))))
+
+(defun switch-mode-if-shebang ()
+  (interactive)
+  (defun string->mode (s)
+	(let ((sym (intern-soft (concat s "-mode"))))
+	  (if (fboundp sym) sym nil)))
+  (when (eq major-mode 'fundamental-mode)
+	(save-excursion
+	  (goto-char (point-min))
+	  (when (search-forward-regexp "^#!.*?\\([^ /]+\\)$" (point-at-eol) t)
+		(funcall (string->mode (match-string 1)))))))
+
+;; for fun, the regexp can also be
+;; (rx line-start 
+;; 	"#!" (minimal-match (zero-or-more anything))
+;; 	(group 
+;; 	 (one-or-more (not (any " /"))))
+;; 	line-end)
+
+;; now with switch-mode-map
+;; I suppose this could be a minor mode (?) I dunno
+
+(defvar switch-mode-map '(("bash" . "sh") ("dash" . "sh") ("zsh" . "sh"))
+  "alist of what mode we really want")
+
+(defun switch-mode-tr (line)
+  (or (cdr (assoc line switch-mode-map))
+	  line))
+
+(defun string->mode (s)
+  (let ((sym (intern-soft (concat s "-mode"))))
+	(if (fboundp sym) sym nil)))
+
+;; (defun switch-mode-if-shebang ()
+;;   (interactive)
+;;   (when (eq major-mode 'fundamental-mode)
+;; 	(save-excursion
+;; 	  (goto-char (point-min))
+;; 	  (when (search-forward-regexp "^#!.*?\\([^ /]+\\)$" (point-at-eol) t)
+;; 		(funcall (string->mode (switch-mode-tr (match-string 1))))))))
+
+(defun switch-mode-get-interpreter ()
+  (save-excursion
+	(goto-char (point-min))
+	(if (search-forward-regexp "^#!.*?\\([^ /]+\\)$" (point-at-eol) t)
+		(match-string 1)
+	  nil)))
+
+;; honestly this should probably do nothing if 
+(defun switch-mode-if-shebang ()
+  (interactive)
+  (when (eq major-mode 'fundamental-mode)
+	(funcall (or (string->mode (switch-mode-tr (switch-mode-get-interpreter)))
+				 (lambda () )))))
