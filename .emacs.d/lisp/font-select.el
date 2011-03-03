@@ -3,6 +3,8 @@
 ;; Copyright (C) 2010 Aaron Siegler
 
 ;; Author: Aaron Siegler <aasiegler@gmail.com>
+(eval-when-compile
+  (require 'cl))
 
 (defmacro return-if-errors (&rest body)
   "Like ignore-errors except returns  on success, nil on error"

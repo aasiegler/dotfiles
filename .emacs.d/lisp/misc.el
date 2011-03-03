@@ -1,3 +1,6 @@
+(eval-when-compile
+  (require 'cl))
+
 ;; misc crap
 
 (defun format-buffer ()
@@ -6,6 +9,7 @@
   (save-excursion
     (indent-region (point-min) (point-max) nil)))
 
+;; btw this is just revert-buffer
 (defun reload-file ()
   (interactive)
   (find-file (buffer-name)))
@@ -159,7 +163,7 @@ the character typed."
 
 ;; FIXME if buffer has no file it'll assign it "" which may
 ;; match some patters - this is a bug
-(defun kill-all-buffers (&optional bname pattern)
+(defun kill-buffers-regexp (&optional bname pattern)
   "Kills all buffers matching pattern - all if not supplied. 
 Applies pattern to file name, or buffer name if prefix arg
 Ignores buffers that like *this*"
@@ -172,6 +176,15 @@ Ignores buffers that like *this*"
 				 (and (string-match killp name)
 					  (not (string-match "\\*.*\\*" name))))
 		  do (kill-buffer b))))
+
+(defun kill-buffers-mode (&optional mode)
+  "Kills all buffers with mode m"
+  (interactive "sMode Name: ")
+  (loop for b in (buffer-list)
+		when (string= (concat mode "-mode")
+					  (buffer-local-value 'major-mode (get-buffer b)))
+		do (kill-buffer b)))
+
 
 (defun insert-literal-tab ()
   "Inserts a tab"
@@ -241,3 +254,15 @@ Ignores buffers that like *this*"
   (when (eq major-mode 'fundamental-mode)
 	(funcall (or (string->mode (switch-mode-tr (switch-mode-get-interpreter)))
 				 (lambda () )))))
+
+(defun apropos-hook (pattern)
+  "stupid thing that does apropos-variable with hook in there.
+this doesn't really work"
+  (interactive "sWork list: ")
+  (apropos-variable (concat "hook " pattern) t))
+
+
+  ;; (interactive (list (apropos-read-pattern
+  ;; 		      (if (or current-prefix-arg apropos-do-all)
+  ;; 			  "variable" "user option"))
+  ;;                    current-prefix-arg))

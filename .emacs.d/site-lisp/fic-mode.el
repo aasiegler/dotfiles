@@ -41,7 +41,7 @@
   "Font foreground colour"
   :group 'fic-mode)
 
-(defcustom fic-background-color  "Yellow"
+(defcustom fic-background-color  "Black"
   "Font background color"
   :group 'fic-mode)
 
@@ -49,6 +49,8 @@
   "variable storing the face for fic mode"
   :group 'fic-mode)
 
+;; FIXME asiegler this makes it useless to customize fic-*-color
+;; unless you do it before you require fic which I don't do
 (make-face 'font-lock-fic-face)
 (modify-face 'font-lock-fic-face fic-foreground-color
              fic-background-color nil t nil t nil nil)
