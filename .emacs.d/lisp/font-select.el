@@ -18,3 +18,5 @@
 	,@(loop for f in font
 			collecting `(return-if-errors (set-frame-font ,f) ,f))))
 
+;; maybe uhhh 
+;; (set-face-attribute 'default nil :font "font name 11")

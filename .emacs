@@ -1,11 +1,14 @@
-;; You can use Firefox rather than Xulrunner to launch Conkeror by
-;; doing bin/firefox -app ~/src/conkeror/application.ini.
+;;; -*- lexical-binding: t -*-
 
 ;; TODO byte compile site-lisp directory
 
-(load-file "~/.gnus")
-
 (require 'cl)
+
+;; ";; -*- lexical-binding: t -*-"
+
+(setf initial-scratch-message ";; You're a peach!
+
+")
 
 ;;; This was installed by package-install.el.
 ;;; This provides support for the package system and
@@ -31,7 +34,7 @@
 (defvar home (concat (expand-file-name "~") "/"))
 (defvar emacs-home (concat home ".emacs.d/"))
 
-(setq debug-on-error t)
+;; (setq debug-on-error t)
 
 (setq inhibit-splash-screen t)
 (if (boundp 'scroll-bar-mode)
@@ -43,10 +46,10 @@
 
 ;; set the screen size to the whole thing if it's lappy
 ;; or just normal if not
-(if (and (= 600 (display-pixel-height))
-		 (= 1024 (display-pixel-width)))	 
-	(setq default-frame-alist '((width . 126) (height . 36)))
-  (setq default-frame-alist '((width . 80) (height . 60))))
+;; (if (and (= 600 (display-pixel-height))
+;; 		 (= 1024 (display-pixel-width)))	 
+;; 	(setq default-frame-alist '((width . 126) (height . 36)))
+;;   (setq default-frame-alist '((width . 80) (height . 60))))
 
 
 (setq default-tab-width 4)
@@ -55,6 +58,7 @@
 (global-font-lock-mode t)
 
 (fset 'yes-or-no-p 'y-or-n-p)
+(defalias 'll-mode 'longlines-mode)
 (iswitchb-mode 1)
 (setq confirm-nonexistent-file-or-buffer nil)
 (setq iswitchb-prompt-newbuffer nil)
@@ -67,14 +71,10 @@
 ;; don't have to set as long as it's in $PATH
 ;; (setq ipython-command "/usr/bin/ipython")
 ;; note: start with C-c !
+;; NOTE: do sys.path.append('/path/to/place') so that you can import modules
 
-;; I'd rather use zsh with both but it works poorly
-;; in my setup
-(if (or mswindows-p cygwin-p)
-	(unless (get-buffer "*eshell*")
-	  (eshell))
-  (unless (get-buffer "*ansi-term*")
-	(ansi-term "zsh")))
+(unless (get-buffer "*eshell*")
+  (eshell))
 
 ;; I want to do something so this works
 ;; probably like after-eval 
@@ -89,10 +89,10 @@
 ;;   (add-path "C:/Util/gnutls-2.10.1/bin"))
 ;; (add-path "C:/Program\\ Files\\ (x86)/Mozilla\\ Firefox\\ 4.0\\ Beta\\ 8/"))
 
-(setf browse-url-firefox-program "C:/Program Files (x86)/Mozilla Firefox 4.0 Beta 9/firefox.exe")
+(setf browse-url-firefox-program "C:/Program Files (x86)/Mozilla Firefox/firefox.exe")
+(setf ispell-program-name "C:/Program Files (x86)/Aspell/bin/aspell.exe")
 
-
-										; setting the PC keyboard's various keys to Super or Hyper
+;; setting the PC keyboard's various keys to Super or Hyper
 (setq w32-pass-lwindow-to-system nil
       w32-pass-rwindow-to-system nil
       w32-pass-apps-to-system nil
@@ -107,13 +107,25 @@
 
 ;; keybindings for anything 
 ;; (global-set-key [(super a)] 'anything)
+
 (global-set-key (kbd "s-a") 'anything)
 (global-set-key (kbd "s-x") 'anything-M-x)
+(global-set-key (kbd "C-c b") 'anything)
+(global-set-key (kbd "C-c C-m") 'anything)
+
+(global-set-key (kbd "C-c k") 'kill-buffers-regexp)
+(global-set-key (kbd "C-c r") 'revert-buffer)
+(global-set-key (kbd "C-c u") 'undo-close-undo)
+
+(global-set-key (kbd "C-c ?") 'ispell-word)
+
+(global-set-key (kbd "C-c d d") #'base64-decode-region)
+(global-set-key (kbd "C-c d e") #'base64-encode-region)
 
 
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cb" 'org-iswitchb)
+;; (global-set-key "\C-cl" 'org-store-link)
+;; (global-set-key "\C-ca" 'org-agenda)
+;; (global-set-key "\C-cb" 'org-iswitchb)
 
 (global-set-key "\M-gg" 'goto-line)
 (global-set-key "\C-x\C-m" 'execute-extended-command)
@@ -122,7 +134,8 @@
 
 ;; (global-set-key "%" 'goto-match-paren)
 
-(global-set-key '[f4] 'speedbar-get-focus)
+;; F4 is end-kbd-macro (or call last) in emacs22+
+;; (global-set-key '[f4] 'speedbar-get-focus)
 
 (global-set-key "\C-c\C-h" 'ff-find-other-file)
 
@@ -131,18 +144,28 @@
 (global-set-key "\M-n" 'other-window)
 (global-set-key "\M-p" 'prev-window)
 
-(global-set-key "\C-x\M-k" 'kill-all-buffers)
+(global-set-key "\C-x\M-k" 'kill-buffers-regexp)
+(global-set-key "\C-x\C-kr" 'kill-buffers-regexp)
+(global-set-key "\C-x\C-km" 'kill-buffers-mode)
 
-(global-unset-key (kbd "<left>"))
-(global-unset-key (kbd "<right>"))
-(global-unset-key (kbd "<up>"))
-(global-unset-key (kbd "<down>"))
+(global-set-key (kbd "<right>") 'windmove-right)
+(global-set-key (kbd "<left>") 'windmove-left)
+(global-set-key (kbd "<up>") 'windmove-up)
+(global-set-key (kbd "<down>") 'windmove-down)
+
+;; (global-unset-key (kbd "<left>"))
+;; (global-unset-key (kbd "<right>"))
+;; (global-unset-key (kbd "<up>"))
+;; (global-unset-key (kbd "<down>"))
 
 (global-set-key "\C-c\C-t" 'insert-literal-tab)
 
 (global-set-key "\C-x\C-c" 'paranoid-exit-from-emacs)
 
 (global-set-key '[f11] 'w32-fullscreen)
+
+(global-set-key (kbd "C-c o") 'open-line-and-indent)
+
 
 
 ;;;------------------------------------------------------
@@ -162,9 +185,11 @@
 ;; 						   "site-lisp/darkroom"))
 ;; 						load-path))
 (mapcar (lambda (p) (add-to-list 'load-path (concat emacs-home p)))
-		'("lisp/"
+		'("dexrex"
+		  "lisp/"
 		  "site-lisp"
 		  "site-lisp/color-theme-6.6.0"
+		  "site-lisp/csharp"
 		  "site-lisp/elib-1.0"
 		  "site-lisp/jdee-2.4.0.1/lisp"
 		  "site-lisp/slime"
@@ -173,9 +198,8 @@
 		  "site-lisp/w3m"
 		  "site-lisp/darkroom"))
 
-(add-to-list 'load-path "/usr/share/emacs/site-lisp/w3m")
-(if mswindows-p
-	(add-to-list 'load-path "c:/Util/IdeBridge/lisp"))
+(unless mswindows-p
+  (add-to-list 'load-path "/usr/share/emacs/site-lisp/w3m"))
 
 (load-library "util")
 (load-library "misc")
@@ -187,6 +211,8 @@
 (require 'anything-match-plugin)
 (require 'color-theme)
 (require 'cltl2)
+(require 'csharp-completion)
+(require 'dx-template-mode)
 (require 'fic-mode)
 (require 'g-utils)
 (require 'python-mode)
@@ -200,6 +226,9 @@
 (require 'uniquify)
 (require 'w32-fullscreen)
 (require 'w3m-load)
+;; (require 'ess-site)
+
+
 
 (autoload 'csharp-mode "csharp-mode.el" "Major mode for editing C# code." t)
 (autoload 'erlang-mode "erlang.el")
@@ -208,9 +237,9 @@
 (autoload 'forth-block-mode "gforth.el")
 (autoload 'html-php-mode "html-php.el" "multi-mode for php and html" t)
 (autoload 'intercal-mode "intercal.el" "Load intercal-mode" t)
-(autoload 'jde-mode "jde.el" "Majore mode for editing java" t)
+(autoload 'jde-mode "jde.el" "Major mode for editing java" t)
 (autoload 'js2-mode "js2.elc" "Major mode for editing javascrip" t) 
-(autoload 'multi-mode "multi-mode.el" "mulit-mode support" t)
+(autoload 'multi-mode "multi-mode.el" "multi-mode support" t)
 (autoload 'nsi-mode "nsi-mode" "nsi editing mode." t)
 (autoload 'php-mode "php-mode.el" "php mode" t)
 
@@ -244,13 +273,13 @@
 ;; or just slime-fancy I think
 (slime-setup '(slime-repl slime-editing-commands))
 
-;; cywgin stuff if windows
-(when mswindows-p
-  (progn
-	(setenv "PATH" (concat "c:/cygwin/bin;" (getenv "PATH")))
-	(setq exec-path (cons "c:/cygwin/bin/" exec-path))
-	(require 'cygwin-mount)
-	(cygwin-mount-activate)))
+;; cywgin stuff if windows (ahhh cygwin is terrible)
+;; (when mswindows-p
+;;   (progn
+;; 	(setenv "PATH" (concat "c:/cygwin/bin;" (getenv "PATH")))
+;; 	(setq exec-path (cons "c:/cygwin/bin/" exec-path))
+;; 	(require 'cygwin-mount)
+;; 	(cygwin-mount-activate)))
 
 (setq org-agenda-files (list "~/org" "~/My Dropbox/org"))
 
@@ -268,24 +297,12 @@
 (setf erc-save-buffer-on-part t)
 
 (require 'erc-join)
+(require 'erc-truncate)
 (erc-autojoin-mode 1)
-(setq erc-autojoin-channels-alist
-	  '(("freenode.net" "#emacs" "#python" "#lisp" "#scheme" "#clojure")))
 
 (load-library "erc-setup")
-;; Truncate buffers so they don't hog core.
-
-;; TODO figure out how to make this work. truncates to 0 lines which
-;; is not at all what I want. it does save on truncation which is nice
-;; er... this should truncate to 20k lines though
-
-;; (setq erc-max-buffer-size 20000)
-;; (defvar erc-insert-post-hook)
-;; (add-hook 'erc-insert-post-hook 'erc-truncate-buffer)
-;; (setq erc-truncate-buffer-on-save t)
-
-;; erc-truncate-buffer-to-size
-
+;; this truncates the buffer down to 0 lines
+;; (setf erc-truncate-buffer-on-save nil) 
 
 
 
@@ -305,6 +322,9 @@
 ;;; offsets and stuff
 ;;;------------------------------------------------------
 ;; yo so to find what part you are in it's c-set-offset (C-c C-o)
+;; so we shouldn't use add-hook
+;; if we re-evaluate this buffer it'll re-add the hooks
+;; we could do add-or-replace-hook and have defun'ed hooks instead of lambdas
 
 ;; elisp
 (add-hook 'emacs-lisp-mode-hook 'turn-on-fic-mode)
@@ -355,10 +375,6 @@
 			(c-set-offset 'substatement-open 0)
 			(c-toggle-hungry-state t)))
 
-(add-hook 'csharp-mode-hook
-		  (lambda ()
-			(c-set-offset 'statement-block-intro 4)))
-
 ;; this is all kind of shitty
 (add-hook 'jde-mode-hook
 		  (lambda ()
@@ -401,8 +417,16 @@
 ;; let's try to match what VS does so we can play nice
 (add-hook 'csharp-mode-hook
 		  (lambda ()
+			(setq indent-tabs-mode nil)
+			;; (local-set-key "\M-\\"   'cscomp-complete-at-point)
+			;; (local-set-key "\M-\."   'cscomp-complete-at-point-menu)
+			;; I'm not sure if these work at all
+			(define-key csharp-mode-map (kbd "{") 'self-insert-command)
+			(define-key csharp-mode-map (kbd "M-\\") 'cscomp-complete-at-point)
+			(define-key csharp-mode-map (kbd "M-?") 'cscomp-complete-at-point-menu)
 			(c-set-offset 'statement-cont 4)
-			(c-set-offset 'arglist-cont-nonempty 4)))
+			(c-set-offset 'arglist-cont-nonempty 4)
+			(c-set-offset 'statement-block-intro 4)))
 
 (add-hook 'lisp-mode-hook
 		  (lambda ()
@@ -418,10 +442,18 @@
 
 (add-hook 'find-file-hook 'bh-choose-header-mode)
 
+;; set-buffer-file-coding-system
+;; iso-latin-1-unix
+;; utf-8-unix
+
 (add-hook 'after-save-hook
 		  'executable-make-buffer-file-executable-if-script-p)
 (add-hook 'after-save-hook
 		  'switch-mode-if-shebang)
+
+(when mswindows-p
+  (add-hook 'after-save-hook 'dos2unix-if-shebang))
+
 
 ;;;------------------------------------------------------
 ;;; variables!
@@ -435,12 +467,14 @@
 			 ("gcj" . "/usr/lib/jvm/java-gcj")))))
 
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(browse-url-browser-function (function browse-url-firefox))
+ '(erc-max-buffer-size 20000)
  '(erc-modules (quote (autojoin button completion fill irccontrols list log match menu move-to-prompt netsplit networks noncommands readonly ring stamp track)))
+ '(erc-truncate-mode t)
  '(fic-background-color "Black")
  '(fic-foreground-color "Red")
  '(fic-highlighted-words (quote ("FIXME" "TODO" "BUG" "KLUDGE" "HACK")))
@@ -448,6 +482,7 @@
  '(jde-jdk (quote ("1.6.0")))
  '(jde-jdk-doc-url "http://download-llnw.oracle.com/javase/6/docs/api")
  '(jde-jdk-registry jdk-locations)
+ '(safe-local-variable-values (quote ((lexical-binding . t))))
  '(tnt-auto-reconnect nil)
  '(uniquify-buffer-name-style (quote post-forward) nil (uniquify)))
 
@@ -459,10 +494,10 @@
 
 
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(twit-title-face ((t (:background "black" :underline "DeepSkyBlue"))))
  '(twit-zebra-1-face ((t (:background "gray30"))))
  '(twit-zebra-2-face ((t (:background "black")))))
@@ -497,4 +532,20 @@
 ;; holy crap this is good
 (defun my-goto-match-beginning ()
   (when isearch-forward (goto-char isearch-other-end)))
+(add-hook 'pre-save-hook
+
+
+;;; NOTES
+;; to set emacs stuff in your files do this
+;; -*- mode: org coding: UTF-8 -*-
+;; this is called ?? something
+
+;; useful commands that I don't remember yet
+;; narrow / widen C-x n n|w
+
+;; highlight-regexp M-s h r 
+;; unhighlight-regexp M-s h u
+
+;; wdired-change-to-wdired-mode
+;; (rename files by directly editing in dired buffers)
 

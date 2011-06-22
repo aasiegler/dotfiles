@@ -191,26 +191,9 @@ Ignores buffers that like *this*"
   (interactive)
   (insert ?\t))
 
-;; TODO add mode map (bash dash etc go to sh-mode)
-;; TODO docstring
-;; (defun switch-mode-if-shebang ()
-;;   (when (eq major-mode 'fundamental-mode)
-;; 	(save-excursion
-;; 	  (goto-char (point-min))
-;; 	  (when (search-forward-regexp "^#!.*?\\([^ /]+\\)$" (point-at-eol) t)
-;; 		(let ((mode (match-string-no-properties 1)))
-;; 		  (eval (read (concat "(" mode "-mode)"))))))))
-
-(defun switch-mode-if-shebang ()
-  (interactive)
-  (defun string->mode (s)
-	(let ((sym (intern-soft (concat s "-mode"))))
-	  (if (fboundp sym) sym nil)))
-  (when (eq major-mode 'fundamental-mode)
-	(save-excursion
-	  (goto-char (point-min))
-	  (when (search-forward-regexp "^#!.*?\\([^ /]+\\)$" (point-at-eol) t)
-		(funcall (string->mode (match-string 1)))))))
+;; set-buffer-file-coding-system
+;; iso-latin-1-unix
+;; utf-8-unix
 
 ;; for fun, the regexp can also be
 ;; (rx line-start 
@@ -221,7 +204,6 @@ Ignores buffers that like *this*"
 
 ;; now with switch-mode-map
 ;; I suppose this could be a minor mode (?) I dunno
-
 (defvar switch-mode-map '(("bash" . "sh") ("dash" . "sh") ("zsh" . "sh"))
   "alist of what mode we really want")
 
@@ -230,7 +212,7 @@ Ignores buffers that like *this*"
 	  line))
 
 (defun string->mode (s)
-  (let ((sym (intern-soft (concat s "-mode"))))
+  (let ((sym (intern-soft (concat (downcase s) "-mode"))))
 	(if (fboundp sym) sym nil)))
 
 ;; (defun switch-mode-if-shebang ()
@@ -243,17 +225,22 @@ Ignores buffers that like *this*"
 
 (defun switch-mode-get-interpreter ()
   (save-excursion
-	(goto-char (point-min))
-	(if (search-forward-regexp "^#!.*?\\([^ /]+\\)$" (point-at-eol) t)
-		(match-string 1)
-	  nil)))
+	(save-match-data
+	  (goto-char (point-min))
+	  (if (search-forward-regexp "^#!.*?\\([^ /]+\\)$" (point-at-eol) t)
+		  (match-string 1)
+		nil))))
 
 ;; honestly this should probably do nothing if 
 (defun switch-mode-if-shebang ()
   (interactive)
   (when (eq major-mode 'fundamental-mode)
-	(funcall (or (string->mode (switch-mode-tr (switch-mode-get-interpreter)))
-				 (lambda () )))))
+	(let ((interp (switch-mode-get-interpreter)))
+;; FIXME lol I broke it if there's no shebang	  
+	  (when interp
+		(funcall 
+		 (or (string->mode (switch-mode-tr (switch-mode-get-interpreter)))
+			 (lambda () )))))))
 
 (defun apropos-hook (pattern)
   "stupid thing that does apropos-variable with hook in there.
@@ -266,3 +253,107 @@ this doesn't really work"
   ;; 		      (if (or current-prefix-arg apropos-do-all)
   ;; 			  "variable" "user option"))
   ;;                    current-prefix-arg))
+
+
+(defun format-number ()
+  "adds commas to a number at the point"
+  (interactive)
+  (save-excursion
+	(forward-word)
+	(let ((i 0)
+		  (sep ","))
+	  (while (not (looking-back "[^0-9]"))
+		(if (= i 3)
+			(progn (setq i 0)
+				   (insert sep))
+		  (setq i (1+ i)))
+		(backward-char)))))
+
+(defun open-line-and-indent (&optional p)
+  "opens a line above or below"
+  (interactive "P")
+  (move-end-of-line (if p 0 1))
+  (newline-and-indent))
+
+
+
+;; This is the worst code ever
+;; tried to figure out how to make the indentation level not
+;; depend on nesting level but I failed and did this instead
+;; change arglist-cont-nonempty to foo to use
+
+;; (defvar *foo-depth* 0)
+;; (defvar *foo-called-line* 0)
+;; (defun foo (p)
+;;   ;; set vars for this line
+;;   (when (null *foo-depth*)
+;; 	(setq *foo-depth* (nested-depth))
+;; 	(setq *foo-called-line* 1))
+;;   (cond ((= *foo-depth* *foo-called-line*)
+;; 		 (setq *foo-depth* nil)
+;; 		 '+)
+;; 		(t
+;; 		 (setq *foo-called-line* (1+ *foo-called-line*))
+;; 		 nil)))
+
+;; (defun nested-depth ()
+;;   (length c-syntactic-context))
+
+(defun toggle-sticky-buffer-window ()
+  "Toggle whether this window is dedicated to this buffer."
+  (interactive)
+  (set-window-dedicated-p
+   (selected-window)
+   (not (window-dedicated-p (selected-window))))
+  (if (window-dedicated-p (selected-window))
+      (message "Window is now dedicated.")
+    (message "Window is no longer dedicated.")))
+
+;; TODO some kind of helper so I can quit
+;; and go through all my unsaved buffer and see the diffs
+
+(defun kill-duplicate-lines ()
+  "kills duplicate lines from current line until the end of the buffer"
+  (interactive)
+  (save-excursion
+	(let ((last nil))
+	  (move-beginning-of-line nil)
+	  (while (not (eobp))
+		(cond ((string= (thing-at-point 'line) last)
+			   (kill-line 1))
+			  (t (setq last (thing-at-point 'line))
+				 (forward-line)))
+		(move-beginning-of-line nil)))))
+
+
+(defun dos2unix-if-shebang ()
+  "sets buffer coding to utf-8-unix if first line is a #!"
+  (when (and (not (eq buffer-file-coding-system 'utf-8-unix))
+			 (switch-mode-get-interpreter))
+	(set-buffer-file-coding-system 'utf-8-unix)))
+
+;; this needs to be buffer local !!!
+(defvar *mode-stack* nil)
+(make-local-variable '*mode-stack*)
+
+(defun push-mode (mode)
+  ;; (interactive "M")
+  (push mode-name *mode-stack*)
+  (funcall (string->mode mode)))
+
+(defun pop-mode ()
+  ;; (interactive)
+  (funcall (string->mode (car *mode-stack*)))
+  (pop *mode-stack*))
+
+(defun mini-mode (mode &optional arg)
+  (interactive "Mmode: \np")
+  (if (= arg 1)
+	  (progn
+		(message "narrowing")
+		(narrow-to-region (region-beginning) (region-end))
+		(push-mode mode))
+	(progn
+	  (message "widening")
+	  (pop-mode)
+	  (widen))))

@@ -1,6 +1,6 @@
 ;; this is from steve yegge's blog somewhere
 
-(defun fix-amazon-url ()
+(defun amazon-fix-url ()
   "Minimizes the Amazon URL under the point.  You can paste an Amazon
 URL out of your browser, put the cursor in it somewhere, and invoke
 this method to convert it."
