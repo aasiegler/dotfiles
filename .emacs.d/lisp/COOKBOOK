@@ -1,0 +1,64 @@
+;; -*- mode: org; -*-
+
+[[./COOKBOOK][raw]]
+
+* TODO figure out how to do this in org-babel
+
+* buffer local variables
+  (make-local-variable SYM)
+
+* points
+  points
+#+begin_src emacs-lisp
+  (point)
+  (point-min) (point-max)
+  (region-beginning) (region-end)
+  (line-beginning-position)
+  (line-end-position)
+#+end_src
+
+  point predicates
+#+begin_src emacs-lisp
+  (bolp) (eolp) (bobp) (eobp)
+#+end_src
+
+#+begin_src emacs-lisp
+  (goto-char p)
+#+end_src
+
+* interactive
+  string arguments separated by newline
+  format is C1P1\nC2P2
+  Code letter, (optional) prompt
+
+* string functions
+#+begin_src emacs-lisp
+(string=)
+(upcase)
+(downcase)
+(concat)
+#+end_src
+
+* buffers
+  extracting stuff from buffers
+  (thing-at-point SYM)
+  SYM in (word line ...)
+
+* regex matching
+
+: (save-match-data &body)
+
+* making this document
+
+  we're using org-babel mode
+  make a #+begin\_src #+end\_src block
+  then edit with org-edit-special `C-c '`
+
+  export to html with org-export-as-html 
+
+  or using something like htmlize
+
+
+
+
+

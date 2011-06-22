@@ -5,7 +5,8 @@ startup_message off
 defutf8 on
 escape ^}]
 termcapinfo xterm|xterms|xs|rxvt ti@:te@
-shell zsh
+# shell zsh
+shell bash
 defscrollback 5000
 
 # default screens
