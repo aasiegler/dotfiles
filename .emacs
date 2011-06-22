@@ -82,12 +82,11 @@
 ;; (setf eshell-path-env (concat eshell-path-env
 ;; 							  ";"
 ;; 							  "C:/Cygwin/bin"))
-;; (setf eshell-path-env (concat eshell-path-env ";" "C:/Program Files (x86)/Mozilla Firefox 4.0 Beta 8/"))
+;; (setf eshell-path-env (concat eshell-path-env ";" "C:/Program Files (x86)/Mozilla Firefox/"))
 ;; (labels ((add-path (p)
 ;; 				   (setenv "PATH" (concat p ";" (getenv "PATH")))))
 ;;   (add-path "C:/Cygwin/bin")
 ;;   (add-path "C:/Util/gnutls-2.10.1/bin"))
-;; (add-path "C:/Program\\ Files\\ (x86)/Mozilla\\ Firefox\\ 4.0\\ Beta\\ 8/"))
 
 (setf browse-url-firefox-program "C:/Program Files (x86)/Mozilla Firefox/firefox.exe")
 (setf ispell-program-name "C:/Program Files (x86)/Aspell/bin/aspell.exe")
@@ -532,7 +531,6 @@
 ;; holy crap this is good
 (defun my-goto-match-beginning ()
   (when isearch-forward (goto-char isearch-other-end)))
-(add-hook 'pre-save-hook
 
 
 ;;; NOTES
